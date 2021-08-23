@@ -10,8 +10,17 @@ function VolumeChanger() {
     
     return (
         <div className="volumeChanger">
-            <span className="uppercase font-bold">Volume {volumeStatus}</span>
-            <input type="range" name="volume" value={volumeStatus} onChange={handleChange} min="0" max="100" step="10" />
+            <span className="uppercase font-bold pb-2">Volume {volumeStatus}</span>
+            <input 
+                type="range" 
+                name="volume" 
+                value={volumeStatus} 
+                onChange={handleChange}
+                min="0"
+                max="100"
+                step="10"
+                className="outline-none cursor-pointer"  
+            />
         </div>
     )
 }
