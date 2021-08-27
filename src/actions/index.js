@@ -14,3 +14,17 @@ export const volume = (volumeLevel) => {
         volumeLevel: volumeLevel
     }
 }
+
+export const dislayKeyDesc = (description) => {
+    return {
+        type: "dislayKeyDesc",
+        description: description
+    }
+}
+
+export const getDatabase = (database) => {
+    return {
+        type: "getDatabase",
+        database: database
+    }
+}

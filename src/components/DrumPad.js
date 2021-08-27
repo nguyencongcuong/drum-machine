@@ -1,17 +1,7 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { database1, database2 } from "../DrumMachineDB"
-import { useSelector } from "react-redux"
-import { useState, useEffect } from "react"
-
-function Screen(props) {
-    return (
-        <div
-            id="display"
-            className="flex justify-center items-center bg-white font-bold text-center rounded mb-4 p-2 h-24">
-            {props.desc}
-        </div>
-    )
-}
+import { useSelector, useDispatch } from "react-redux"
+import { dislayKeyDesc, getDatabase } from "../actions"
 
 function DrumKey(props) {
 
@@ -32,7 +22,6 @@ function DrumKey(props) {
             onClick={props.onClick}
         >
             <audio 
-                controls 
                 id={props.keyName}
                 className="clip"
                 src={props.audioURL} 
@@ -45,16 +34,15 @@ function DrumKey(props) {
 
 function DrumPad() {
 
-    const [keyDesc, setKeyDesc] = useState("")
-    const [audioID, setAudioID] = useState("")
-    const [database, setDatabase] = useState([])
-
     const powerStatus = useSelector(state => state.powerReducer)
     const modeStatus = useSelector(state => state.modeReducer)
     const volumeStatus = useSelector(state => state.volumeReducer) / 100
+    const database = useSelector(state => state.databaseReducer)
+    
+    const dispatch = useDispatch()
 
-    const playAudio = (id) => {
-        const audio = document.getElementById(id)
+    const playAudio = (keyID) => {
+        const audio = document.getElementById(keyID)
         if(powerStatus) {
             audio.muted = false
             audio.volume = volumeStatus
@@ -64,36 +52,32 @@ function DrumPad() {
         }
     }
 
+    const handler = (keyID, keyDesc) => {
+        playAudio(keyID)
+        dispatch(dislayKeyDesc(keyDesc))
+    }
+
     useEffect(() => {
-        modeStatus === 1 ? setDatabase(database1) : setDatabase(database2)
+        modeStatus === 1 ? dispatch(getDatabase(database1)) : dispatch(getDatabase(database2))
     }, [modeStatus])
 
-    const DrumPadList = () => {
-        return database.map(e => 
+    const DrumPadList = () =>
+        database.map(e => 
             <DrumKey
-                key={ e.name }
-                keyCode={ e.keyCode }
-                keyName={ e.name } 
+                key={ e.code }
+                keyName={e.name}
+                keyCode={ e.code }
                 keyDesc={ e.desc }
                 audioURL={ e.url }
-                onClick={ () => {
-                    setKeyDesc(e.desc)
-                    playAudio(e.name)
-                }}
-                onKeyDown={ () => {
-                    setKeyDesc(e.desc)
-                    setAudioID(e.name)
-                    playAudio(e.name)
-                }}
+                onClick={ () => handler(e.name, e.desc) }
+                onKeyDown={ () => handler(e.name, e.desc) }
             />
         )
-    }
 
     return (
         <React.Fragment>
-            <Screen desc={keyDesc} />
             <div className="grid grid-cols-3 gap-1">
-                {DrumPadList()}
+                { DrumPadList() }
             </div>
         </React.Fragment>
     )
